@@ -1,0 +1,28 @@
+{
+  "best_model": "Random Forest",
+  "results": {
+    "Linear Regression": {
+      "MAE": 1.205,
+      "R2": 0.802
+    },
+    "Decision Tree": {
+      "MAE": 1.057,
+      "R2": 0.865
+    },
+    "Random Forest": {
+      "MAE": 0.847,
+      "R2": 0.919
+    }
+  },
+  "train_rows": 315,
+  "test_rows": 79,
+  "correlation_with_G3": {
+    "G2": 0.905,
+    "G1": 0.801,
+    "studytime": 0.098,
+    "absences": 0.036,
+    "health": -0.065,
+    "age": -0.16,
+    "failures": -0.36
+  }
+}

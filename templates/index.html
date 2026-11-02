@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Score Predictor</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; color: #222; }
+    header { background: #2c4a6e; color: #fff; padding: 18px 24px; }
+    header h1 { margin: 0; font-size: 1.4rem; }
+    main { max-width: 960px; margin: 24px auto; padding: 0 16px; }
+    .card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+    label { display: block; margin-top: 12px; font-size: .9rem; font-weight: bold; }
+    input { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; }
+    button { margin-top: 18px; padding: 10px 22px; background: #2c4a6e; color: #fff;
+             border: 0; border-radius: 4px; font-size: 1rem; cursor: pointer; }
+    .result { font-size: 1.6rem; font-weight: bold; color: #2c4a6e; }
+    .error { color: #b00020; font-weight: bold; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #eef2f7; }
+    .best { background: #e6f4ea; font-weight: bold; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+    .grid img { width: 100%; border: 1px solid #ddd; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <header><h1>Student Academic Performance &mdash; Final Score Predictor</h1></header>
+  <main>
+    <div class="card">
+      <h2>Predict final grade (G3)</h2>
+      <form method="post">
+        {% for name, (label, lo, hi, default) in features.items() %}
+          <label for="{{ name }}">{{ label }}</label>
+          <input type="number" step="any" min="{{ lo }}" max="{{ hi }}" id="{{ name }}"
+                 name="{{ name }}" value="{{ values[name] }}" required>
+        {% endfor %}
+        <button type="submit">Predict</button>
+      </form>
+      {% if error %}<p class="error">{{ error }}</p>{% endif %}
+      {% if prediction is not none %}
+        <p>Predicted final grade: <span class="result">{{ prediction }} / 20</span><br>
+           Status: <strong>{{ status }}</strong><br>
+           <small>Model used: {{ metrics.best_model }}</small></p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2>Model comparison (test set)</h2>
+      <table>
+        <tr><th>Model</th><th>MAE (lower = better)</th><th>R&sup2; (higher = better)</th></tr>
+        {% for name, r in metrics.results.items() %}
+          <tr {% if name == metrics.best_model %}class="best"{% endif %}>
+            <td>{{ name }}{% if name == metrics.best_model %} (best){% endif %}</td>
+            <td>{{ r.MAE }}</td><td>{{ r.R2 }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+      <p><small>Trained on {{ metrics.train_rows }} students, tested on {{ metrics.test_rows }}.</small></p>
+    </div>
+
+    <div class="card">
+      <h2>Data analysis</h2>
+      <div class="grid">
+        <img src="{{ url_for('static', filename='plots/g3_distribution.png') }}" alt="G3 distribution">
+        <img src="{{ url_for('static', filename='plots/studytime_vs_g3.png') }}" alt="Study time vs G3">
+        <img src="{{ url_for('static', filename='plots/absences_vs_g3.png') }}" alt="Absences vs G3">
+        <img src="{{ url_for('static', filename='plots/g2_vs_g3.png') }}" alt="G2 vs G3">
+        <img src="{{ url_for('static', filename='plots/model_comparison.png') }}" alt="Model comparison">
+        <img src="{{ url_for('static', filename='plots/actual_vs_predicted.png') }}" alt="Actual vs predicted">
+      </div>
+    </div>
+  </main>
+</body>
+</html>
